@@ -1,0 +1,12 @@
+{"name": "my-tools",
+"owner":{
+    "name": "mdkb0",
+    "email": "mdkb0@example.com"
+},
+"plugins": [{
+    "name": "independent-reviewer",
+    "source": "./independent-reviewer",
+    "description": "Carry out an independent review of all changes since the last commit",
+    "version": "1.0.0"
+}]
+}
