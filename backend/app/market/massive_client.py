@@ -5,8 +5,12 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from massive import RESTClient
-from massive.rest.models import SnapshotMarketType
+try:  # `massive` is only required when a real API key is configured
+    from massive import RESTClient
+    from massive.rest.models import SnapshotMarketType
+except ImportError:  # pragma: no cover - exercised only without the package
+    RESTClient = None  # type: ignore[assignment,misc]
+    SnapshotMarketType = None  # type: ignore[assignment]
 
 from .cache import PriceCache
 from .interface import MarketDataSource
@@ -36,9 +40,11 @@ class MassiveDataSource(MarketDataSource):
         self._interval = poll_interval
         self._tickers: list[str] = []
         self._task: asyncio.Task | None = None
-        self._client: RESTClient | None = None
+        self._client: "RESTClient | None" = None
 
     async def start(self, tickers: list[str]) -> None:
+        if RESTClient is None:
+            raise RuntimeError("The 'massive' package is required when MASSIVE_API_KEY is set")
         self._client = RESTClient(api_key=self._api_key)
         self._tickers = list(tickers)
 

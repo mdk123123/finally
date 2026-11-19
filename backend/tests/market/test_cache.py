@@ -101,3 +101,24 @@ class TestPriceCache:
         cache = PriceCache()
         update = cache.update("AAPL", 190.12345)
         assert update.price == 190.12
+
+
+def test_concurrent_updates_are_thread_safe():
+    import threading
+
+    cache = PriceCache()
+    n_threads, n_updates = 8, 500
+
+    def worker(i: int) -> None:
+        for k in range(n_updates):
+            cache.update(f"T{i}", 100.0 + k)
+            cache.get_all()
+
+    threads = [threading.Thread(target=worker, args=(i,)) for i in range(n_threads)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert cache.version == n_threads * n_updates
+    assert len(cache) == n_threads
