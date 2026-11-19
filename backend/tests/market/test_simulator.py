@@ -129,3 +129,12 @@ class TestGBMSimulator:
         if '.' in price_str:
             decimal_part = price_str.split('.')[1]
             assert len(decimal_part) <= 2
+
+
+def test_default_ten_tickers_cholesky_and_step():
+    tickers = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "NVDA", "META", "JPM", "V", "NFLX"]
+    sim = GBMSimulator(tickers)
+    assert sim.get_tickers() == tickers
+    prices = sim.step()
+    assert set(prices) == set(tickers)
+    assert all(p > 0 for p in prices.values())
